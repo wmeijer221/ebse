@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  python:
+    build: .
+    volumes:
+      - ./:/app:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  sonarqube:
+    image: sonarqube:9.2.4-community
+    ports:
+      - 9000:9000

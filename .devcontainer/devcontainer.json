@@ -1,0 +1,16 @@
+{
+	"name": "Existing Docker Compose (Extend)",
+	"dockerComposeFile": [
+		"../docker-compose.yml",
+		"docker-compose.yml"
+	],
+	"service": "python",
+	"workspaceFolder": "/workspace",
+	"settings": {},
+	"extensions": [
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-toolsai.jupyter-renderers",
+		"ms-toolsai.jupyter",
+	]
+}
