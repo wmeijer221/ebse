@@ -4,5 +4,9 @@ WORKDIR /app/scripts
 
 COPY ./scripts .
 
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
+# Install sonar-scanner
+RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+RUN unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+ENV PATH="${PATH}:/app/sonar-scanner-4.6.2.2472-linux/bin"
