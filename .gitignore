@@ -1,4 +1,4 @@
 
-scripts/compilation pipeline/repos/
-scripts/compilation pipeline/output/**-sonarqube-output.log
+**/repos/
+**.log
 *.db

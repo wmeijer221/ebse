@@ -1,5 +1,4 @@
 import json
-import os
 import sqlite3
 from sqlite3 import Connection, Cursor
 from typing import Tuple
@@ -39,7 +38,7 @@ def write_to_file(db_results: Cursor, project_id: str) -> None:
 
         output.append(entry)
 
-    with open(f"./commits_{project_id}.txt", "w") as output_file:
+    with open(f"./commits_{project_id}.json", "w") as output_file:
         output_file.write(json.dumps(output, indent=2))
 
 
