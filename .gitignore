@@ -1,4 +1,7 @@
 
 **/repos/
 **.log
-*.db
+**.db
+**.zip
+
+sonar-scanner*
