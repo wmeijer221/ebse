@@ -10,12 +10,13 @@ import sqlite3
 # - Add your GitHub API token (in place of [your_api_token]) to disable GitHub API's rate limit
 
 
-DATASET_PATH = '[path/to/apache.db]'
-GITHUB_API_HEADERS = {"Authorization": "token [your_api_token]"}
+# DATASET_PATH = '[path/to/apache.db]'
+# GITHUB_API_HEADERS = {"Authorization": "token [your_api_token]"}
 
 GITHUB_API_URL = 'https://api.github.com/repositories/'
 
-
+DATASET_PATH = '../../../data/apache.db'
+GITHUB_API_HEADERS = {"Authorization": "token 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"}
 
 def getChangedFilesByCommit(repo_id, commit_id):
   """Returns the changed file information object from a specific git commit using the GitHub API."""
@@ -55,7 +56,7 @@ def getLineNumberOfStringInFile(target, file):
       matched_lines = []
       for t_line_number, t_line in enumerate(target_split): # Check subsequent lines against the target string
         offset_line_number = f_line_number + t_line_number # File line number offset with the current line number of the checked potential match
-        if t_line in file_split[offset_line_number]: # Target line matched in file line
+        if offset_line_number < len(file_split) and t_line in file_split[offset_line_number]: # Target line matched in file line
           matched_lines.append(offset_line_number + 1) # + 1 for 1-indexed absolute line numbers
         else:
           break
@@ -68,20 +69,29 @@ def getLineNumberOfStringInFile(target, file):
 
 
 if __name__ == '__main__':
+  # print(requests.get('http://api.github.com/rate_limit' , GITHUB_API_HEADERS).text)
+
+  result = []
 
   con = sqlite3.connect(DATASET_PATH)
   cur = con.cursor()
 
   # Query that collects the git comment SATD items that are to be processed from the dataset (LIMIT for development)
-  q = 'SELECT repo_id, sha, comment \
+  q = 'SELECT repo_id, sha, comment, b.id, c.label, c.short_label \
     FROM git_comment a \
     JOIN git_comment_satd b ON a.id = b.id \
+    JOIN satd_label c ON b.label_id = c.id \
     WHERE b.label_id != 0 \
-    LIMIT 25'
+    AND a.repo_id = 33884891'
+    # LIMIT 10'
 
   rows = cur.execute(q)
 
+  # print('\n\tPROCESSING', rows.rowcount, 'SATD ITEMS...')
+
   for row in rows:
+    # print(row)
+    # result_row = {'satd_id': row[3], 'satd_text': row[2], 'file': None, 'lines': None}
     found = False # Flag to indicate if the comment text was found in any of the commit's changed files
     changed_files = getChangedFilesByCommit(row[0], row[1]) # Get list of changed files
     
@@ -98,11 +108,29 @@ if __name__ == '__main__':
       if match != []:
         print("\n\t\tIN FILE: '", file['filename'], "'")
         found = True
-        for m in match: print("\t\t\t", m)
+        for m in match: 
+          print("\t\t\t", m)
+          result.append({'satd_id': row[3], 'satd_repo': row[0], 'satd_sha': row[1], 'satd_text': row[2], 'satd_label': row[4],'satd_label_short': row[5], 'file': file['filename'], 'lines': m[0], 'matched_text': m[1]})
         sys.stdout.flush()
     if not found:
-      print("\t!! NO MATCHES FOUND FOR '", row[2].splitlines()[0][:100], "'")
+      print("\t!!! NO MATCHES FOUND FOR '", row[2].splitlines()[0][:100], "' !!!")
+      result.append({'satd_id': row[3], 'satd_text': row[2], 'satd_label': row[4],'satd_label_short': row[5], 'file': False, 'lines': False, 'matched_text': None})
       sys.stdout.flush()
 
     print("\n")
+
     sys.stdout.flush()
+
+
+  print("\n\tDUMPING OUTPUT TO FILE...\n")
+  sys.stdout.flush()
+  # Output result to JSON file for future use
+  with open("./results/airflow_line_numbers.json", "w") as outfile:
+    json.dump(result, outfile)
+
+
+  print("\n\t\tDONE!\n")
+  sys.stdout.flush()
+  # for r in result:
+  #   print(result)
+  #   sys.stdout.flush()
