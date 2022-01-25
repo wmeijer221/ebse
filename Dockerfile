@@ -4,6 +4,7 @@ WORKDIR /app/scripts
 
 COPY ./scripts .
 
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # Install sonar-scanner
