@@ -16,7 +16,7 @@ DATASET_PATH = '../../../data/apache.db'
 SONARQUBE_RESULTS_PATH = '../compilation pipeline/results/'
 SONARQUBE_RESULTS_FILE = 'issues-trafficserver.json'
 
-GITHUB_API_HEADERS = {"Authorization": "token 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"}
+GITHUB_API_HEADERS = {"Authorization": "token [your_api_token]"}
 
 GITHUB_API_URL = 'https://api.github.com/repositories/'
 

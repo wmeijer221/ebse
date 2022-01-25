@@ -10,13 +10,11 @@ import sqlite3
 # - Add your GitHub API token (in place of [your_api_token]) to disable GitHub API's rate limit
 
 
-# DATASET_PATH = '[path/to/apache.db]'
-# GITHUB_API_HEADERS = {"Authorization": "token [your_api_token]"}
+DATASET_PATH = '[path/to/apache.db]'
+GITHUB_API_HEADERS = {"Authorization": "token [your_api_token]"}
 
 GITHUB_API_URL = 'https://api.github.com/repositories/'
 
-DATASET_PATH = '../../../data/apache.db'
-GITHUB_API_HEADERS = {"Authorization": "token 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"}
 
 def getChangedFilesByCommit(repo_id, commit_id):
   """Returns the changed file information object from a specific git commit using the GitHub API."""
