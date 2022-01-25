@@ -1,3 +1,11 @@
+"""
+Performs SonarQube analysis per commit on the files 
+that have SATD items linked to it. 
+Expects the output generated with ``GitSATDLineNumbers.py``'s 
+output as input. 
+"""
+
+import shutil
 from subprocess import Popen
 import json
 import os
@@ -7,12 +15,39 @@ from git import Repo
 
 
 def read_input(proj_id: str) -> dict:
-    with open(f"./input/commits_{proj_id}.json", "r") as input_file:
+    """Reads input file as json"""
+
+    path = os.path.abspath(f"./input/commitss_{proj_id}.json")
+    with open(path, "r") as input_file:
         return json.loads(input_file.read())
 
 
+def interpret_data(data: list) -> dict:
+    """Transforms json data to be separated per commit."""
+
+    reformat = {}
+
+    for entry in data:
+        # Entries that could not be linked to a file
+        # are ignored.
+        if not entry["file"]:
+            continue
+
+        sha = entry["satd_sha"]
+
+        if sha in reformat:
+            reformat[sha].append(entry)
+        else:
+            reformat[sha] = [entry]
+
+    return reformat
+
+
 def clone_repository(url: str, proj_name: str) -> str:
+    """Clones repository"""
+
     dir = os.path.join("./repos", proj_name)
+    dir = os.path.abspath(dir)
 
     repo = Repo(dir) if os.path.exists(dir) else Repo.clone_from(url, dir)
 
@@ -20,6 +55,8 @@ def clone_repository(url: str, proj_name: str) -> str:
 
 
 def create_sq_project(sq_server: str, auth: Tuple, proj_id: str) -> str:
+    """Creates a SonarQube project for the current project"""
+
     url = f"{sq_server}/api/projects/create"
     name = f"project-{proj_id}"
     args = {"name": name, "project": name, "visibility": "public"}
@@ -29,12 +66,48 @@ def create_sq_project(sq_server: str, auth: Tuple, proj_id: str) -> str:
     return name
 
 
-def move_head(proj_repo: Repo, commit: dict):
-    hash = commit["sha"]
-    proj_repo.git.checkout(hash, force=True)
+def move_head(proj_repo: Repo, sha: str):
+    """Moves Repository head to different commit"""
+
+    proj_repo.git.checkout(sha, force=True)
+
+
+def copy_changed_files(entries: list, dir: str) -> Tuple[str, int]:
+    """Copies relevant files to the analysis folder"""
+
+    targetdir = os.path.abspath("./tmp/analysis-folder")
+    if os.path.exists(targetdir):
+        shutil.rmtree(targetdir)
+
+    try:
+        os.mkdir(targetdir)
+    except:
+        pass
+
+    moved_files = 0
+
+    for entry in entries:
+        file = entry["file"]
+        from_path = os.path.join(dir, file)
+
+        # TODO: check for is_deleted field.
+        # Files that do not exist are ignored.
+        if not os.path.exists(from_path):
+            continue
+
+        to_path = os.path.join(targetdir, file)
+
+        os.makedirs(os.path.dirname(to_path), exist_ok=True)
+        shutil.copy(from_path, to_path)
+
+        moved_files += 1
+
+    return targetdir, moved_files
 
 
 def run_sonarqube(sq_server: str, auth: Tuple, dir: str, proj_id: str):
+    """Runs SonarQube analysis on the test folder."""
+
     args = [
         "sonar-scanner",
         "-Dsonar.sources=.",
@@ -47,46 +120,67 @@ def run_sonarqube(sq_server: str, auth: Tuple, dir: str, proj_id: str):
         "-Dsonar.exclusions=/**.java",
     ]
 
+    old_dir = os.path.abspath(os.curdir)
     os.chdir(dir)
-
-    with Popen(args):
-        pass
-
-    os.chdir("../" * (len(dir.split("/")) - 1))
+    Popen(args).wait()
+    os.chdir(old_dir)
 
 
-def export_issues(sq_server: str, auth: Tuple, proj_id: str, commit: dict):
+def export_issues(sq_server: str, auth: Tuple, proj_id: str, sha: str):
+    """Exports SonarQube issues to a file."""
+
     url = f"{sq_server}/api/issues/search"
     data = {"componentKeys": proj_id}
     res = requests.get(url=url, data=data, auth=auth)
-    sha = commit["sha"]
 
-    with open(f"./results/p-{proj_id}_c-{sha}.json", "w") as output_file:
+    path = os.path.abspath(f"./results/{proj_id}_c-{sha[:8]}.json")
+    with open(path, "w") as output_file:
         output_file.write(res.text)
 
 
+def delete_sq_project(proj_name: str, sq_server: str, sq_auth: Tuple):
+    """Deletes SonarQube project."""
+
+    url = f"{sq_server}/api/projects/delete"
+    data = {"project": proj_name}
+    requests.post(url=url, data=data, auth=sq_auth)
+
+
 def main(git_id: str, proj_uri: str, sq_server: str, sq_auth: Tuple):
-    proj_id = create_sq_project(sq_server, sq_auth, git_id)
+    """Performs SonarQube analysis lifecycle."""
+
     proj_dir, proj_repo = clone_repository(proj_uri, git_id)
 
     commits = read_input(git_id)
-    prev_sha = None
+    data = interpret_data(commits)
 
-    for commit in commits:
-        print(f'\n{"=" * 30}\nHANDLING ({proj_id=}, {commit["sha"]=})\n{"=" * 30}\n')
+    for sha, entries in data.items():
+        print(f'\n{"=" * 90}\nHANDLING ({git_id=}, {sha=})\n{"=" * 90}\n')
 
-        sha = commit["sha"]
-        if sha == prev_sha: 
+        proj_id = create_sq_project(sq_server, sq_auth, git_id)
+
+        delete_sq_project(proj_id, sq_server, sq_auth)
+
+        if len(entries) == 0:
+            print("Commit has no valid SATD entries.")
             continue
-        
-        prev_sha = sha
 
-        move_head(proj_repo, commit)
-        run_sonarqube(sq_server, sq_auth, proj_dir, proj_id)
-        export_issues(sq_server, sq_auth, proj_id, commit)
+        move_head(proj_repo, sha)
+        targetdir, moved_files = copy_changed_files(entries, proj_dir)
+
+        if moved_files == 0:
+            print("Zero files could be moved to analysis directory.")
+            continue
+
+        run_sonarqube(sq_server, sq_auth, targetdir, proj_id)
+        export_issues(sq_server, sq_auth, proj_id, sha)
+
+        delete_sq_project(proj_id, sq_server, sq_auth)
 
 
 if __name__ == "__main__":
+    # By default, performs SonarQube analysis on
+    # Apache Airflow.
     git_id = "33884891"
     proj_uri = "https://github.com/apache/airflow"
 

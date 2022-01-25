@@ -3,5 +3,6 @@
 **.log
 **.db
 **.zip
+tmp/
 
 sonar-scanner*
