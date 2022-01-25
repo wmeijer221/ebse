@@ -112,7 +112,7 @@ if __name__ == '__main__':
         sys.stdout.flush()
     if not found:
       print("\t!!! NO MATCHES FOUND FOR '", row[2].splitlines()[0][:100], "' !!!")
-      result.append({'satd_id': row[3], 'satd_text': row[2], 'satd_label': row[4],'satd_label_short': row[5], 'file': False, 'lines': False, 'matched_text': None})
+      result.append({'satd_id': row[3], 'satd_repo': row[0], 'satd_sha': row[1],'satd_text': row[2], 'satd_label': row[4],'satd_label_short': row[5], 'file': False, 'lines': False, 'matched_text': None})
       sys.stdout.flush()
 
     print("\n")
