@@ -3,10 +3,12 @@ import sys
 import json
 import csv
 import warnings
+import pandas as pd
 from time import sleep
 from itertools import product
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from gensim.parsing.preprocessing import remove_stopwords
 from SATDHandler import SATD
 from SQHandler import SQ
 
@@ -15,13 +17,16 @@ from SQHandler import SQ
 SATD_FILE_PATH = '../results/airflow_line_numbers.json'
 SONARQUBE_FILES_PATH = '../../satd_commit_pipeline/results/'
 
-LINEDISTANCE_THRESHOLD = 5
+LINEDISTANCE_THRESHOLD = 50
 
-JACCARD_SIM_THRESHOLD = 0.15
-# COSINE_SIM_THRESHOLD = 
+# JACCARD_SIM_THRESHOLD = 0.1
+# COSINE_SIM_THRESHOLD = 0.1
 
-WRITE_TO_CSV = False
-CSV_FILE_PATH = '../results/satd-sq-combinations.csv'
+WRITE_TO_CSV = True
+
+USE_CSV_REFERENCE = True
+REFERENCE_CSV_PATH = '../results/satd-sq-combinations-filtered.csv'
+CSV_FILE_PATH = '../results/satd-sq-combinations-filtered-scores.csv'
 
 
 
@@ -41,15 +46,19 @@ def computeDistance(x, y):
 def compareLineDistance(satd, sq):
   """Checks whether the line distance between an SATD comment and SonarQube issue exceeds the threshold or not"""
   if(len(satd['lines']) == 1):
-    return computeDistance(satd['lines'][0], sq['line']) <= LINEDISTANCE_THRESHOLD
+    dist = computeDistance(satd['lines'][0], sq['line'])
+    return (dist, dist <= LINEDISTANCE_THRESHOLD)
 
   elif(len(satd['lines']) > 1):
     start = min(satd['lines'])
     end = max(satd['lines'])
 
-    return ( \
-      (computeDistance(start, sq['line']) <= LINEDISTANCE_THRESHOLD) \
-      or (computeDistance(end, sq['line']) <= LINEDISTANCE_THRESHOLD))
+    d_start = computeDistance(start, sq['line'])
+    d_end = computeDistance(end, sq['line'])
+
+    dist = min(d_start, d_end)
+
+    return (dist, dist <= LINEDISTANCE_THRESHOLD)
 
 
 def computeJaccardSim(str1, str2):
@@ -82,8 +91,8 @@ def vectorizeStrings(*strs):
 
 def computeTextualSimilarity(satd, sq):
   """Computes the textual similarity metrics between an SATD comment and SonarQube issue"""
-  satd_text = satd['satd_text']
-  sq_text = sq['message']
+  satd_text = remove_stopwords(satd['satd_text'])
+  sq_text = remove_stopwords(sq['message'])
 
   jaccard = computeJaccardSim(satd_text, sq_text)
   cosine = computeCosineSim(satd_text, sq_text)
@@ -96,16 +105,17 @@ if __name__ == '__main__':
   satd = SATD(SATD_FILE_PATH)
   sq = SQ(SONARQUBE_FILES_PATH)
 
-  unique_commits = satd.getUniqueCommits()
-
-
-  # test_file = 'airflow/www/static/js/gantt.js'
-  # test_sha = 'a9314dd63bc62d61ab7b625367f02650274ac99f'
-
+  if USE_CSV_REFERENCE:
+    df = pd.read_csv(REFERENCE_CSV_PATH)
+    unique_commits = df['commit'].unique()
+    print(unique_commits)
+  else:
+    unique_commits = satd.getUniqueCommits()
 
   if(WRITE_TO_CSV):
     combs_csv = []
 
+  count = 0
 
   for commit in unique_commits:
     # Fetch files with SATD in current commit
@@ -120,28 +130,32 @@ if __name__ == '__main__':
         comb_satd = comb[0]
         comb_sq = comb[1]
 
+        if comb_sq['message'] == 'Complete the task associated to this \"TODO\" comment.':
+          continue
 
         line_distance_match = compareLineDistance(comb_satd, comb_sq)
-        textual_sim = computeTextualSimilarity(comb_satd, comb_sq)
 
-        # if line_distance_match:
-        #   print(commit, file, comb_satd['lines'], comb_sq['line'], line_distance_match)
-        #   sys.stdout.flush()
+        if line_distance_match[1]:
+          count += 1
+          textual_sim = computeTextualSimilarity(comb_satd, comb_sq)
+          jaccard_score = textual_sim[0]
+          cosine_score = textual_sim[1][0][1]
+          print("\n")
+          print(comb_satd['satd_text'])
+          print(comb_sq['message'])
+          print("Jaccard: \n", jaccard_score)
+          print("Cosine: \n", cosine_score)
+          sys.stdout.flush()
 
-        # if textual_sim[0] > 0.15:
-        #   print("\n")
-        #   print(comb_satd['satd_text'])
-        #   print(comb_sq['message'])
-        #   print("Jaccard: \n", textual_sim[0])
-        #   print("Cosine: \n", textual_sim[1])
-        #   sys.stdout.flush()
 
-
-        if(WRITE_TO_CSV):
+        if(WRITE_TO_CSV and line_distance_match[1]):
+          url = 'https://www.github.com/apache/airflow/commit/' + comb_satd['satd_sha']
           csv_line = { \
             'satd_id': comb_satd['satd_id'], \
             'commit': commit, \
             'file': file, \
+            'URL': url,\
+            'distance': line_distance_match[0], \
             '________': '________', \
             'satd_lines': comb_satd['lines'], \
             'satd_label': comb_satd['satd_label'], \
@@ -149,16 +163,21 @@ if __name__ == '__main__':
             '_________': '_________', \
             'sq_line': comb_sq['line'], \
             'sq_issue': comb_sq['message'], \
+            '__________': '__________', \
+            'jaccard': jaccard_score, \
+            'cosine': cosine_score, \
             }
           combs_csv.append(csv_line)
 
-          sleep(1)
+          # sleep(1)
 
+
+  print(count)
 
   if(WRITE_TO_CSV):
     csv_keys = combs_csv[0].keys()
 
     with open(CSV_FILE_PATH, 'w', newline='') as output_file:
-        dict_writer = csv.DictWriter(output_file, csv_keys, delimiter=";")
+        dict_writer = csv.DictWriter(output_file, csv_keys, delimiter=",")
         dict_writer.writeheader()
         dict_writer.writerows(combs_csv)
