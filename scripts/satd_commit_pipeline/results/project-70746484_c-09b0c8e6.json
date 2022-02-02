@@ -1,0 +1,314 @@
+{
+  "total": 2,
+  "p": 1,
+  "ps": 100,
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 100,
+    "total": 2
+  },
+  "effortTotal": 26,
+  "issues": [
+    {
+      "key": "AX65YYdBTheadKzx9Byn",
+      "rule": "python:S1192",
+      "severity": "CRITICAL",
+      "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+      "project": "project-70746484",
+      "line": 53,
+      "hash": "185b44e757ce70224f40d580af3248e3",
+      "textRange": {
+        "startLine": 53,
+        "endLine": 53,
+        "startOffset": 28,
+        "endOffset": 41
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 107,
+                "endLine": 107,
+                "startOffset": 18,
+                "endOffset": 31
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 169,
+                "endLine": 169,
+                "startOffset": 32,
+                "endOffset": 45
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 183,
+                "endLine": 183,
+                "startOffset": 32,
+                "endOffset": 45
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 200,
+                "endLine": 200,
+                "startOffset": 28,
+                "endOffset": 41
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 245,
+                "endLine": 245,
+                "startOffset": 28,
+                "endOffset": 41
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 255,
+                "endLine": 255,
+                "startOffset": 28,
+                "endOffset": 41
+              },
+              "msg": "Duplication"
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Define a constant instead of duplicating this literal \"threadIdx.x\" 7 times.",
+      "effort": "14min",
+      "debt": "14min",
+      "author": "",
+      "tags": [
+        "design"
+      ],
+      "creationDate": "2022-02-02T07:41:18+0000",
+      "updateDate": "2022-02-02T07:41:18+0000",
+      "type": "CODE_SMELL",
+      "scope": "MAIN",
+      "quickFixAvailable": false
+    },
+    {
+      "key": "AX65YYdBTheadKzx9Bym",
+      "rule": "python:S1192",
+      "severity": "CRITICAL",
+      "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+      "project": "project-70746484",
+      "line": 54,
+      "hash": "43db4d25f412ec6f16cf98bf260d4871",
+      "textRange": {
+        "startLine": 54,
+        "endLine": 54,
+        "startOffset": 28,
+        "endOffset": 40
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 170,
+                "endLine": 170,
+                "startOffset": 32,
+                "endOffset": 44
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 184,
+                "endLine": 184,
+                "startOffset": 32,
+                "endOffset": 44
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 201,
+                "endLine": 201,
+                "startOffset": 28,
+                "endOffset": 40
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 246,
+                "endLine": 246,
+                "startOffset": 28,
+                "endOffset": 40
+              },
+              "msg": "Duplication"
+            }
+          ]
+        },
+        {
+          "locations": [
+            {
+              "component": "project-70746484:python/tvm/topi/cuda/unique.py",
+              "textRange": {
+                "startLine": 256,
+                "endLine": 256,
+                "startOffset": 28,
+                "endOffset": 40
+              },
+              "msg": "Duplication"
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Define a constant instead of duplicating this literal \"blockIdx.x\" 6 times.",
+      "effort": "12min",
+      "debt": "12min",
+      "author": "",
+      "tags": [
+        "design"
+      ],
+      "creationDate": "2022-02-02T07:41:18+0000",
+      "updateDate": "2022-02-02T07:41:18+0000",
+      "type": "CODE_SMELL",
+      "scope": "MAIN",
+      "quickFixAvailable": false
+    }
+  ],
+  "components": [
+    {
+      "key": "project-70746484:python/tvm/topi/cuda/unique.py",
+      "name": "unique.py",
+      "qualifier": "FIL",
+      "path": "python/tvm/topi/cuda/unique.py",
+      "language": "py",
+      "measures": [
+        {
+          "metric": "ncloc",
+          "value": "220"
+        },
+        {
+          "metric": "complexity",
+          "value": "17"
+        },
+        {
+          "metric": "duplicated_blocks",
+          "value": "1",
+          "bestValue": false
+        },
+        {
+          "metric": "violations",
+          "value": "2",
+          "bestValue": false
+        },
+        {
+          "metric": "code_smells",
+          "value": "2",
+          "bestValue": false
+        },
+        {
+          "metric": "bugs",
+          "value": "0",
+          "bestValue": true
+        },
+        {
+          "metric": "vulnerabilities",
+          "value": "0",
+          "bestValue": true
+        }
+      ]
+    },
+    {
+      "key": "project-70746484:python/tvm/topi/unique.py",
+      "name": "unique.py",
+      "qualifier": "FIL",
+      "path": "python/tvm/topi/unique.py",
+      "language": "py",
+      "measures": [
+        {
+          "metric": "ncloc",
+          "value": "122"
+        },
+        {
+          "metric": "complexity",
+          "value": "20"
+        },
+        {
+          "metric": "duplicated_blocks",
+          "value": "1",
+          "bestValue": false
+        },
+        {
+          "metric": "bugs",
+          "value": "0",
+          "bestValue": true
+        },
+        {
+          "metric": "code_smells",
+          "value": "0",
+          "bestValue": true
+        },
+        {
+          "metric": "violations",
+          "value": "0",
+          "bestValue": true
+        },
+        {
+          "metric": "vulnerabilities",
+          "value": "0",
+          "bestValue": true
+        }
+      ]
+    }
+  ],
+  "facets": []
+}

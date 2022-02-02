@@ -205,10 +205,8 @@ def main(git_id: str, proj_uri: str, sq_server: str, sq_auth: Tuple):
         delete_sq_project(proj_id, sq_server, sq_auth)
 
 if __name__ == "__main__":
-    # By default, performs SonarQube analysis on
-    # Apache Airflow.
-    git_id = "33884891"
-    proj_uri = "https://github.com/apache/airflow"
+    git_id = "70746484"
+    proj_uri = "https://github.com/apache/tvm"
 
     sq_server = "http://sonarqube:9000"
     sq_auth = ("admin", "password")
