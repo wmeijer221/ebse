@@ -45,14 +45,24 @@ TODO: this could probably be made a little friendlier.
 
 ### Step 2) SATD Commit Extracting
 - navigate to ``extract_satd_commits``.
-- open ``extract_commit_hashes.py``.
+- open ``extract_commit_hashes.py`` in an IDE or text editor.
 - change ``db_path`` variable to where your data set is stored.
 - change ``project_id`` to the desired project; this value corresponds with the github id.
 - TODO: where does one get this number from? Elaborate on this, or change the input of the script.
 - run ``python3 extract_satd_commits.py`` in the command line and wait.
 - a new ``.json`` file will have generated, containing your data in format.
 
-### Step 3) SonarQube Issue Generation per Commit
+### Step 3) SATD file and line tracing
+TODO: This is not the matching step, GitSATDLineNumbers.py script is ran in advance of sonarqube analysis to determine which files need to be analysed for each commit. This needs to be cleaned in the repo.
+- navigate to the ``isue_satd_matching`` folder. 
+- open ``GitSATDLineNumbers.py``
+- change ``DATASET_PATH`` to the path of the data set. 
+- change the ``token`` field inside ``GITHUB_API_HEADERS`` to your Github API token
+- change the ``repo_id`` inside the ``SQL`` query to the desired repo id; same as in steps 2 and 3.
+- run ``python3 GitSATDLineNumbers.py`` in the command line and wait.
+- the results will be generated in the ``results`` folder. 
+
+### Step 4) SonarQube Issue Generation per Commit
 - launch a SonarQube server (using the Docker image is the easiest) with port 9000 opened.
 - navigate to ``satd_commit_pipeline`` folder.
 - copy the results from step 2 into the ``input`` folder.
@@ -66,21 +76,14 @@ TODO: this could probably be made a little friendlier.
 - the results will be generated in multiple ``.json`` files the ``results`` folder.
 - you can stop the SonarQube server at this point.
 
-### Step 4) SonarQube SATD line tracing
-- navigate to the ``isue_satd_matching`` folder. 
-- open ``GitSATDLineNumbers.py``
-- change ``DATASET_PATH`` to the path of the data set. 
-- change the ``token`` field inside ``GITHUB_API_HEADERS`` to your Github API token
-- change the ``repo_id`` inside the ``SQL`` query to the desired repo id; same as in steps 2 and 3.
-- run ``python3 GitSATDLineNumbers.py`` in the command line and wait.
-- the results will be generated in the ``results`` folder. 
 
 ### Step 5) Matching SATDs with SonarQube Issues
-- navigate to the ``issue_satd_matching`` folder. 
-- open ``TextualSimilarity.py``
-- change ``DATASET_PATH`` to the path of the data set. 
-- change ``SONARQUBE_RESULTS_FILE`` to the correct file. 
-- change the ``token`` field inside ``GITHUB_API_HEADERS`` to your Github API token. 
-- change or remove the ``LIMIT``clause in the ``SQL`` query at the bottom. 
-- run ``python3 TextualSimilarity.py`` in the command line and wait. 
-- the results will be generated in the ``results`` folder.
+TODO: This script was temporary and will be removed. Instead, the matching is done using the pipeline in the ``scripts/issue_satd_matching/pipeline/`` folder. Instructions need to be added once codebase is polished.
+~~- navigate to the ``issue_satd_matching`` folder.~~
+~~- open ``TextualSimilarity.py``~~
+~~- change ``DATASET_PATH`` to the path of the data set.~~ 
+~~- change ``SONARQUBE_RESULTS_FILE`` to the correct file.~~ 
+~~- change the ``token`` field inside ``GITHUB_API_HEADERS`` to your Github API token. ~~
+~~- change or remove the ``LIMIT``clause in the ``SQL`` query at the bottom. ~~
+~~- run ``python3 TextualSimilarity.py`` in the command line and wait. ~~
+~~- the results will be generated in the ``results`` folder.~~
