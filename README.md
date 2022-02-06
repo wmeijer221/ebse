@@ -82,6 +82,6 @@ TODO: This script was temporary and will be removed. Instead, the matching is do
 - open ``pipeline.py`` in an IDE or text editor.
 - change ``REPO_NAME`` to the desired GitHub Apache repository name (repo from ``Apache/repo``).
 - change ``SATD_FILE_PATH`` to the correct JSON **file** containing the output from step 2 (if it is different from the default location).
-- change ``SONARQUBE_FILES_PATH`` to the correct **directory** containing the output from step 2 (if it is different from the default location).
+- change ``SONARQUBE_FILES_PATH`` to the correct **directory** containing the output from step 3 (if it is different from the default location).
 - run ``python3 pipeline.py`` in the command line and wait.
 - the results will be generated in the ``issue_satd_matching/results`` folder.
