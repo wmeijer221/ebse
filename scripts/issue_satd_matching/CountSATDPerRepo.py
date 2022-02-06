@@ -23,15 +23,6 @@ def getRepoByID(repo_id):
   return json.loads(r.text)
 
 
-# def getRepoLOCByID(repo_id):
-#   url = GITHUB_API_URL + str(repo_id) + '/languages'
-#   r = requests.get(url, headers=GITHUB_API_HEADERS)
-#   data = json.loads(r.text)
-#   loc = sum([v for v in data.values()])
-
-#   return (loc, data)
-
-
 if __name__ == '__main__':
   con = sqlite3.connect(DATASET_PATH)
   cur = con.cursor()

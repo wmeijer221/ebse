@@ -5,23 +5,17 @@ import json
 import sqlite3
 
 
+# Configuration
+GITHUB_REPO = 'airflow'
+DATASET_PATH = './path/to/apache.db'
+GITHUB_API_HEADERS = {"Authorization": "token GITHUB_API_TOKEN"}
 
-# INSTRUCTIONS: 
-# - Set DATASET_PATH below to the path to the apache.db file (in place of [path/to/apache.db])
-# - Add your GitHub API token (in place of [your_api_token]) to disable GitHub API's rate limit
-# - Set the desired apache GITHUB_REPO name (i.e. [name] from apache/[name])
-
-
-DATASET_PATH = '../../../data/apache_cleaned.db'
-GITHUB_API_HEADERS = {"Authorization": "token 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"}
-
-GITHUB_REPO = 'tvm'
 
 GITHUB_API_URL = 'https://api.github.com/repositories/'
 
 
-
 def getRepoIDByRepoName(repo_name):
+  """Returns an GitHub repo ID from a repo name (Apache only)"""
   url = 'https://api.github.com/repos/apache/'+ repo_name
   r = requests.get(url, headers=GITHUB_API_HEADERS)
 

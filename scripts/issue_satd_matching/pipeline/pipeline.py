@@ -12,23 +12,18 @@ from gensim.parsing.preprocessing import remove_stopwords
 from SATDHandler import SATD
 from SQHandler import SQ
 
-
+# Configuration
 REPO_NAME = 'tvm'
-
-
-SATD_FILE_PATH = '../results/' + REPO_NAME + '_line_numbers.json'
+SATD_FILE_PATH = '../../satd_tracing/results/' + REPO_NAME + '_line_numbers.json'
 SONARQUBE_FILES_PATH = '../../satd_commit_pipeline/results/' + REPO_NAME + '/'
+WRITE_TO_CSV = True
 
 LINEDISTANCE_THRESHOLD = 50
 
-# JACCARD_SIM_THRESHOLD = 0.1
-# COSINE_SIM_THRESHOLD = 0.1
-
-WRITE_TO_CSV = True
-
+# Use this if the processing order of a previously generated CSV should be followed
 USE_CSV_REFERENCE = False
-REFERENCE_CSV_PATH = '../results/' + REPO_NAME + '-satd-sq-combinations-filtered.csv'
-CSV_FILE_PATH = '../results/' + REPO_NAME + '-satd-sq-combinations-filtered-scores.csv'
+REFERENCE_CSV_PATH = '../../satd_tracing/results/' + REPO_NAME + '-satd-sq-combinations-filtered.csv'
+CSV_FILE_PATH = '../../satd_tracing/results/' + REPO_NAME + '-satd-sq-combinations-filtered-scores.csv'
 
 
 
@@ -171,8 +166,6 @@ if __name__ == '__main__':
             'cosine': cosine_score, \
             }
           combs_csv.append(csv_line)
-
-          # sleep(1)
 
 
   print(count)
