@@ -13,9 +13,11 @@ from SATDHandler import SATD
 from SQHandler import SQ
 
 
+REPO_NAME = 'tvm'
 
-SATD_FILE_PATH = '../results/airflow_line_numbers.json'
-SONARQUBE_FILES_PATH = '../../satd_commit_pipeline/results/'
+
+SATD_FILE_PATH = '../results/' + REPO_NAME + '_line_numbers.json'
+SONARQUBE_FILES_PATH = '../../satd_commit_pipeline/results/' + REPO_NAME + '/'
 
 LINEDISTANCE_THRESHOLD = 50
 
@@ -24,9 +26,9 @@ LINEDISTANCE_THRESHOLD = 50
 
 WRITE_TO_CSV = True
 
-USE_CSV_REFERENCE = True
-REFERENCE_CSV_PATH = '../results/satd-sq-combinations-filtered.csv'
-CSV_FILE_PATH = '../results/satd-sq-combinations-filtered-scores.csv'
+USE_CSV_REFERENCE = False
+REFERENCE_CSV_PATH = '../results/' + REPO_NAME + '-satd-sq-combinations-filtered.csv'
+CSV_FILE_PATH = '../results/' + REPO_NAME + '-satd-sq-combinations-filtered-scores.csv'
 
 
 
@@ -130,7 +132,8 @@ if __name__ == '__main__':
         comb_satd = comb[0]
         comb_sq = comb[1]
 
-        if comb_sq['message'] == 'Complete the task associated to this \"TODO\" comment.':
+        if comb_sq['message'] == 'Complete the task associated to this \"TODO\" comment.' \
+          or comb_sq['message'] == 'Take the required action to fix the issue indicated by this \"FIXME\" comment.':
           continue
 
         line_distance_match = compareLineDistance(comb_satd, comb_sq)
@@ -149,7 +152,7 @@ if __name__ == '__main__':
 
 
         if(WRITE_TO_CSV and line_distance_match[1]):
-          url = 'https://www.github.com/apache/airflow/commit/' + comb_satd['satd_sha']
+          url = 'https://www.github.com/apache/' + REPO_NAME + '/commit/' + comb_satd['satd_sha']
           csv_line = { \
             'satd_id': comb_satd['satd_id'], \
             'commit': commit, \
