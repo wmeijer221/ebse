@@ -46,8 +46,7 @@ When running the scripts for the first time, you might have to run ``pip install
 - navigate to ``extract_satd_commits``.
 - open ``extract_commit_hashes.py`` in an IDE or text editor.
 - change ``db_path`` variable to where your data set is stored.
-- change ``project_id`` to the desired project; this value corresponds with the github id.
-- TODO: where does one get this number from? Elaborate on this, or change the input of the script.
+- change ``project_id`` to the desired project; this value corresponds with the GitHub ID and can be found using the GitHub API by replacing [name] in the URL ``https://api.github.com/repos/apache/[name]`` with the Apache repository name (repo from ``Apache/repo``), and taking the value of the uppermost ``id`` key. 
 - run ``python3 extract_satd_commits.py`` in the command line and wait.
 - a new ``.json`` file will have generated, containing your data in format.
 
@@ -77,7 +76,6 @@ When running the scripts for the first time, you might have to run ``pip install
 
 
 ### Step 4) Matching SATDs with SonarQube Issues
-TODO: This script was temporary and will be removed. Instead, the matching is done using the pipeline in the ``scripts/issue_satd_matching/pipeline/`` folder. Instructions need to be added once codebase is polished.
 - navigate to the ``issue_satd_matching/pipeline`` folder.
 - open ``pipeline.py`` in an IDE or text editor.
 - change ``REPO_NAME`` to the desired GitHub Apache repository name (repo from ``Apache/repo``).
